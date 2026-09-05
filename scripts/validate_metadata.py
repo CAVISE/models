@@ -15,9 +15,9 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate metadata and artifacts in every model bundle.")
-    parser.add_argument("--source-repository", default="CAVISE/OpenCDA", help="Expected source.repository value.")
-    parser.add_argument("--source-url", default="https://github.com/CAVISE/OpenCDA", help="Expected source.url value.")
-    parser.add_argument("--source-license", default="MIT", help="Expected source.license value.")
+    parser.add_argument("--source-repository", required=True, help="Expected source.repository value.")
+    parser.add_argument("--source-url", required=True, help="Expected source.url value.")
+    parser.add_argument("--source-license", required=True, help="Expected source.license value.")
     return parser.parse_args()
 
 

@@ -38,6 +38,10 @@ repos:
         name: validate model metadata and artifacts
         entry: python scripts/validate_metadata.py
         language: python
+        args:
+          - --source-repository=CAVISE/OpenCDA
+          - --source-url=https://github.com/CAVISE/OpenCDA
+          - --source-license=MIT
         additional_dependencies:
           - pyyaml==6.0.3
         pass_filenames: false

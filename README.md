@@ -30,7 +30,10 @@ artifact's presence, size, and SHA-256 checksum, as well as the bundle source
 fields:
 
 ```bash
-python scripts/validate_metadata.py
+python scripts/validate_metadata.py \
+  --source-repository CAVISE/OpenCDA \
+  --source-url https://github.com/CAVISE/OpenCDA \
+  --source-license MIT
 ```
 
 The same validation runs automatically as part of pre-commit:
@@ -42,13 +45,15 @@ pre-commit run --all-files
 To regenerate all `meta.yaml` files and `catalog.yaml`, run:
 
 ```bash
-python scripts/generate_metadata.py
+python scripts/generate_metadata.py \
+  --source-repository CAVISE/OpenCDA \
+  --source-url https://github.com/CAVISE/OpenCDA \
+  --source-license MIT
 ```
 
-Generation overwrites existing bundle metadata. By default, both scripts use
-`CAVISE/OpenCDA`, `https://github.com/CAVISE/OpenCDA`, and `MIT` for the source
-fields. Override them with matching arguments when importing bundles from a
-different source:
+Generation overwrites existing bundle metadata. All three source arguments
+are required by both scripts. Pass matching values to the validator after
+importing bundles from a different source:
 
 ```bash
 python scripts/generate_metadata.py \
