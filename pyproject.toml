@@ -1,0 +1,24 @@
+[tool.ruff]
+line-length = 150
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.mypy]
+python_version = "3.12"
+files = ["scripts"]
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+pretty = true
+
+[tool.deadcode]
+exclude = [".git", ".mypy_cache", ".ruff_cache"]

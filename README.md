@@ -39,6 +39,22 @@ The same validation runs automatically as part of pre-commit:
 pre-commit run --all-files
 ```
 
+## Python quality checks
+
+Python 3.12 is used for the repository tooling. Install the development tools
+through pre-commit, or run each check directly:
+
+```bash
+ruff check scripts
+ruff format --check scripts
+mypy scripts
+deadcode scripts
+```
+
+Ruff also enforces NumPy-style docstrings for the Python scripts. Pull requests
+run these four checks independently in CI, while `pre-commit run --all-files`
+runs the same checks locally.
+
 To add a bundle, first place its files into a new directory directly under
 `coperception/` or `advcp/`. Then pass that directory and its source information
 to the generator:
