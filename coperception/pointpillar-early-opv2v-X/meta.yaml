@@ -9,8 +9,8 @@ compatibility:
   requires_custom_cuda: false
 source:
   repository: CAVISE/OpenCDA
-  url: REVIEW_REQUIRED
-  license: REVIEW_REQUIRED
+  url: https://github.com/CAVISE/OpenCDA
+  license: MIT
 artifacts:
   - path: config.yaml
     size: 2562

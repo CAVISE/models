@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import sys
 from pathlib import Path
@@ -12,6 +13,14 @@ import yaml
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Validate metadata and artifacts in every model bundle.")
+    parser.add_argument("--source-repository", default="CAVISE/OpenCDA", help="Expected source.repository value.")
+    parser.add_argument("--source-url", default="https://github.com/CAVISE/OpenCDA", help="Expected source.url value.")
+    parser.add_argument("--source-license", default="MIT", help="Expected source.license value.")
+    return parser.parse_args()
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as artifact:
@@ -20,7 +29,7 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def validate_bundle(bundle_root: Path) -> list[str]:
+def validate_bundle(bundle_root: Path, expected_source: dict[str, str]) -> list[str]:
     errors: list[str] = []
     metadata_path = bundle_root / "meta.yaml"
     try:
@@ -32,6 +41,8 @@ def validate_bundle(bundle_root: Path) -> list[str]:
         return [f"{metadata_path}: metadata must be a mapping"]
     if metadata.get("id") != bundle_root.name:
         errors.append(f"{metadata_path}: id does not match directory name")
+    if metadata.get("source") != expected_source:
+        errors.append(f"{metadata_path}: source does not match the expected repository, URL, and license")
 
     artifacts = metadata.get("artifacts")
     if not isinstance(artifacts, list) or not artifacts:
@@ -57,11 +68,17 @@ def validate_bundle(bundle_root: Path) -> list[str]:
 
 
 def main() -> int:
+    args = parse_args()
+    expected_source = {
+        "repository": args.source_repository,
+        "url": args.source_url,
+        "license": args.source_license,
+    }
     errors: list[str] = []
     for category in ("coperception", "advcp"):
         for bundle_root in sorted(REPOSITORY_ROOT.joinpath(category).iterdir()):
             if bundle_root.is_dir():
-                errors.extend(validate_bundle(bundle_root))
+                errors.extend(validate_bundle(bundle_root, expected_source))
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1

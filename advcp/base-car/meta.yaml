@@ -4,8 +4,8 @@ kind: advcp-assets
 version: 1
 source:
   repository: CAVISE/OpenCDA
-  url: REVIEW_REQUIRED
-  license: REVIEW_REQUIRED
+  url: https://github.com/CAVISE/OpenCDA
+  license: MIT
 artifacts:
   - path: car_mesh_0200.ply
     size: 4611459
