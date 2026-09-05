@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Add one model or runtime-asset bundle to the repository catalog."""
 
 from __future__ import annotations
 
@@ -31,6 +32,13 @@ class DuplicateArtifactError(GenerationError):
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments.
+
+    Returns
+    -------
+    argparse.Namespace
+        Parsed bundle path and source metadata.
+    """
     parser = argparse.ArgumentParser(description="Generate metadata and register one new model or runtime asset bundle.")
     parser.add_argument("bundle", help="New bundle path relative to the repository, for example coperception/my-model.")
     parser.add_argument("--source-repository", required=True, help="Repository name written to source.repository.")
@@ -40,6 +48,18 @@ def parse_args() -> argparse.Namespace:
 
 
 def sha256(path: Path) -> str:
+    """Calculate a file's SHA-256 digest.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+        File to hash.
+
+    Returns
+    -------
+    str
+        Lowercase hexadecimal digest.
+    """
     digest = hashlib.sha256()
     with path.open("rb") as artifact:
         for chunk in iter(lambda: artifact.read(1024 * 1024), b""):
@@ -48,6 +68,24 @@ def sha256(path: Path) -> str:
 
 
 def resolve_new_bundle(bundle_argument: str) -> tuple[str, Path]:
+    """Resolve and validate a new bundle directory.
+
+    Parameters
+    ----------
+    bundle_argument : str
+        Absolute path or repository-relative bundle path.
+
+    Returns
+    -------
+    tuple[str, pathlib.Path]
+        Bundle category and resolved directory.
+
+    Raises
+    ------
+    GenerationError
+        If the path is outside the repository, has an unsupported layout, is
+        missing, or already contains metadata.
+    """
     requested_path = Path(bundle_argument).expanduser()
     bundle_root = (requested_path if requested_path.is_absolute() else REPOSITORY_ROOT / requested_path).resolve()
     try:
@@ -67,6 +105,23 @@ def resolve_new_bundle(bundle_argument: str) -> tuple[str, Path]:
 
 
 def collect_artifacts(bundle_root: Path) -> list[dict[str, str | int]]:
+    """Build metadata records for every artifact in a bundle.
+
+    Parameters
+    ----------
+    bundle_root : pathlib.Path
+        Bundle directory to scan recursively.
+
+    Returns
+    -------
+    list[dict[str, str | int]]
+        Artifact paths, sizes, and SHA-256 digests.
+
+    Raises
+    ------
+    GenerationError
+        If the bundle is empty or contains a symbolic link.
+    """
     artifacts: list[dict[str, str | int]] = []
     for path in sorted(bundle_root.rglob("*")):
         if path.is_file() and path.name != "meta.yaml":
@@ -85,6 +140,23 @@ def collect_artifacts(bundle_root: Path) -> list[dict[str, str | int]]:
 
 
 def load_yaml_mapping(path: Path) -> dict[str, object]:
+    """Load a YAML document and require a mapping at its root.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+        YAML file to load.
+
+    Returns
+    -------
+    dict[str, object]
+        Parsed YAML mapping.
+
+    Raises
+    ------
+    GenerationError
+        If the file is unreadable, invalid, or does not contain a mapping.
+    """
     try:
         document = yaml.safe_load(path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as error:
@@ -95,6 +167,23 @@ def load_yaml_mapping(path: Path) -> dict[str, object]:
 
 
 def existing_sha_index(catalog_entries: list[dict[str, str]]) -> dict[str, list[tuple[str, str]]]:
+    """Index artifact digests from every catalog entry.
+
+    Parameters
+    ----------
+    catalog_entries : list[dict[str, str]]
+        Existing normalized catalog entries.
+
+    Returns
+    -------
+    dict[str, list[tuple[str, str]]]
+        Mapping from SHA-256 digest to bundle ID and artifact path pairs.
+
+    Raises
+    ------
+    GenerationError
+        If the checkout is incomplete or existing metadata is invalid.
+    """
     index: dict[str, list[tuple[str, str]]] = {}
     for entry in catalog_entries:
         bundle_root = REPOSITORY_ROOT.joinpath(entry["path"]).resolve()
@@ -122,6 +211,22 @@ def reject_duplicate_artifacts(
     artifacts: list[dict[str, str | int]],
     catalog_entries: list[dict[str, str]],
 ) -> None:
+    """Reject candidate artifacts already registered in another bundle.
+
+    Parameters
+    ----------
+    bundle_id : str
+        Candidate bundle ID.
+    artifacts : list[dict[str, str | int]]
+        Candidate artifact metadata.
+    catalog_entries : list[dict[str, str]]
+        Existing catalog entries used to build the digest index.
+
+    Raises
+    ------
+    DuplicateArtifactError
+        If any candidate SHA-256 digest already exists in the catalog.
+    """
     sha_index = existing_sha_index(catalog_entries)
     conflicts: list[str] = []
     for artifact in artifacts:
@@ -134,12 +239,25 @@ def reject_duplicate_artifacts(
 
 
 def load_catalog_entries() -> list[dict[str, str]]:
+    """Load and normalize the current bundle catalog.
+
+    Returns
+    -------
+    list[dict[str, str]]
+        Existing catalog entries.
+
+    Raises
+    ------
+    GenerationError
+        If the catalog schema or an entry is invalid.
+    """
     catalog = load_yaml_mapping(CATALOG_PATH)
-    if catalog.get("schema_version") != 1 or not isinstance(catalog.get("bundles"), list):
+    bundles = catalog.get("bundles")
+    if catalog.get("schema_version") != 1 or not isinstance(bundles, list):
         raise GenerationError(f'Unsupported or invalid catalog: "{CATALOG_PATH}".')
 
     entries: list[dict[str, str]] = []
-    for entry in catalog["bundles"]:
+    for entry in bundles:
         if not isinstance(entry, dict) or not all(isinstance(entry.get(field), str) for field in ("id", "kind", "path")):
             raise GenerationError(f'Invalid bundle entry in "{CATALOG_PATH}".')
         entries.append({field: entry[field] for field in ("id", "kind", "path")})
@@ -147,6 +265,24 @@ def load_catalog_entries() -> list[dict[str, str]]:
 
 
 def add_catalog_entry(entries: list[dict[str, str]], *, bundle_id: str, kind: str, path: str) -> None:
+    """Append a unique bundle entry to an in-memory catalog.
+
+    Parameters
+    ----------
+    entries : list[dict[str, str]]
+        Catalog entries to update.
+    bundle_id : str
+        Logical bundle ID.
+    kind : str
+        Metadata kind associated with the bundle category.
+    path : str
+        Repository-relative bundle path.
+
+    Raises
+    ------
+    GenerationError
+        If the bundle ID or path is already registered.
+    """
     if any(entry["id"] == bundle_id for entry in entries):
         raise GenerationError(f'Bundle ID "{bundle_id}" is already present in the catalog.')
     if any(entry["path"] == path for entry in entries):
@@ -155,6 +291,18 @@ def add_catalog_entry(entries: list[dict[str, str]], *, bundle_id: str, kind: st
 
 
 def render_artifacts(artifacts: list[dict[str, str | int]]) -> list[str]:
+    """Render artifact records as YAML lines.
+
+    Parameters
+    ----------
+    artifacts : list[dict[str, str | int]]
+        Artifact records to render.
+
+    Returns
+    -------
+    list[str]
+        YAML lines for the ``artifacts`` sequence.
+    """
     lines: list[str] = []
     for artifact in artifacts:
         lines.extend(
@@ -168,6 +316,24 @@ def render_artifacts(artifacts: list[dict[str, str | int]]) -> list[str]:
 
 
 def render_metadata(category: str, bundle_id: str, source: dict[str, str], artifacts: list[dict[str, str | int]]) -> str:
+    """Render metadata for one bundle.
+
+    Parameters
+    ----------
+    category : str
+        Bundle category from :data:`CATEGORY_KINDS`.
+    bundle_id : str
+        Logical bundle ID.
+    source : dict[str, str]
+        Source repository, URL, and license.
+    artifacts : list[dict[str, str | int]]
+        Artifact records included in the bundle.
+
+    Returns
+    -------
+    str
+        Complete ``meta.yaml`` document.
+    """
     lines = [
         "schema_version: 1",
         f"id: {bundle_id}",
@@ -200,6 +366,18 @@ def render_metadata(category: str, bundle_id: str, source: dict[str, str], artif
 
 
 def render_catalog(entries: list[dict[str, str]]) -> str:
+    """Render sorted catalog entries as YAML.
+
+    Parameters
+    ----------
+    entries : list[dict[str, str]]
+        Catalog entries to render.
+
+    Returns
+    -------
+    str
+        Complete catalog document.
+    """
     lines = ["schema_version: 1", "bundles:"]
     for entry in sorted(entries, key=lambda item: item["path"]):
         lines.extend(
@@ -213,6 +391,22 @@ def render_catalog(entries: list[dict[str, str]]) -> str:
 
 
 def write_new_bundle(metadata_path: Path, metadata: str, catalog: str) -> None:
+    """Commit new metadata and catalog content with temporary files.
+
+    Parameters
+    ----------
+    metadata_path : pathlib.Path
+        Destination for the new bundle metadata.
+    metadata : str
+        Rendered metadata document.
+    catalog : str
+        Rendered catalog document.
+
+    Raises
+    ------
+    OSError
+        If either document cannot be written or installed.
+    """
     metadata_temporary = metadata_path.with_suffix(".yaml.tmp")
     catalog_temporary = CATALOG_PATH.with_suffix(".yaml.tmp")
     metadata_committed = False
@@ -232,6 +426,13 @@ def write_new_bundle(metadata_path: Path, metadata: str, catalog: str) -> None:
 
 
 def main() -> int:
+    """Run the incremental bundle registration command.
+
+    Returns
+    -------
+    int
+        Zero on success and one when preflight or writing fails.
+    """
     args = parse_args()
     try:
         source = {

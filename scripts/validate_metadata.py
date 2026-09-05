@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Validate bundle metadata, artifacts, and catalog consistency."""
 
 from __future__ import annotations
 
@@ -17,6 +18,18 @@ CATEGORY_KINDS = {
 
 
 def sha256(path: Path) -> str:
+    """Calculate a file's SHA-256 digest.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+        File to hash.
+
+    Returns
+    -------
+    str
+        Lowercase hexadecimal digest.
+    """
     digest = hashlib.sha256()
     with path.open("rb") as artifact:
         for chunk in iter(lambda: artifact.read(1024 * 1024), b""):
@@ -25,6 +38,20 @@ def sha256(path: Path) -> str:
 
 
 def validate_bundle(bundle_root: Path, expected_kind: str) -> list[str]:
+    """Validate one bundle and all artifacts declared by its metadata.
+
+    Parameters
+    ----------
+    bundle_root : pathlib.Path
+        Bundle directory containing ``meta.yaml``.
+    expected_kind : str
+        Metadata kind required for the bundle's category.
+
+    Returns
+    -------
+    list[str]
+        Validation errors, or an empty list for a valid bundle.
+    """
     errors: list[str] = []
     metadata_path = bundle_root / "meta.yaml"
     try:
@@ -70,6 +97,18 @@ def validate_bundle(bundle_root: Path, expected_kind: str) -> list[str]:
 
 
 def validate_catalog(expected_entries: set[tuple[str, str, str]]) -> list[str]:
+    """Compare the catalog with bundle directories in the checkout.
+
+    Parameters
+    ----------
+    expected_entries : set[tuple[str, str, str]]
+        Bundle ID, kind, and path tuples discovered from the filesystem.
+
+    Returns
+    -------
+    list[str]
+        Catalog validation errors, or an empty list when it is consistent.
+    """
     catalog_path = REPOSITORY_ROOT / "catalog.yaml"
     try:
         catalog = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
@@ -101,6 +140,13 @@ def validate_catalog(expected_entries: set[tuple[str, str, str]]) -> list[str]:
 
 
 def main() -> int:
+    """Validate the complete repository.
+
+    Returns
+    -------
+    int
+        Zero when all checks pass and one when validation errors are found.
+    """
     errors: list[str] = []
     expected_entries: set[tuple[str, str, str]] = set()
     for category, kind in CATEGORY_KINDS.items():
