@@ -30,10 +30,7 @@ artifact's presence, size, and SHA-256 checksum, as well as the bundle source
 fields:
 
 ```bash
-python scripts/validate_metadata.py \
-  --source-repository CAVISE/OpenCDA \
-  --source-url https://github.com/CAVISE/OpenCDA \
-  --source-license MIT
+python scripts/validate_metadata.py
 ```
 
 The same validation runs automatically as part of pre-commit:
@@ -42,26 +39,32 @@ The same validation runs automatically as part of pre-commit:
 pre-commit run --all-files
 ```
 
-To regenerate all `meta.yaml` files and `catalog.yaml`, run:
+To add a bundle, first place its files into a new directory directly under
+`coperception/` or `advcp/`. Then pass that directory and its source information
+to the generator:
 
 ```bash
-python scripts/generate_metadata.py \
+python scripts/generate_metadata.py coperception/my-model \
   --source-repository CAVISE/OpenCDA \
   --source-url https://github.com/CAVISE/OpenCDA \
   --source-license MIT
 ```
 
-Generation overwrites existing bundle metadata. All three source arguments
-are required by both scripts. Pass matching values to the validator after
-importing bundles from a different source:
+The generator creates only that bundle's `meta.yaml` and appends one sorted
+entry to `catalog.yaml`; existing bundle metadata is never regenerated. Before
+writing anything, it compares every new artifact's SHA-256 against all existing
+metadata. If the same content is already registered under another bundle ID,
+the command aborts and reports both locations.
+
+Run the generator from a complete checkout. If metadata for any bundle listed
+in `catalog.yaml` is missing locally, the command aborts rather than performing
+an incomplete duplicate search.
+
+All three source arguments are required. For a bundle imported from another
+repository, provide that repository's values:
 
 ```bash
-python scripts/generate_metadata.py \
-  --source-repository example/models \
-  --source-url https://github.com/example/models \
-  --source-license Apache-2.0
-
-python scripts/validate_metadata.py \
+python scripts/generate_metadata.py advcp/example-assets \
   --source-repository example/models \
   --source-url https://github.com/example/models \
   --source-license Apache-2.0

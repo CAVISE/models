@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import sys
 from pathlib import Path
@@ -11,14 +10,10 @@ import yaml
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Validate metadata and artifacts in every model bundle.")
-    parser.add_argument("--source-repository", required=True, help="Expected source.repository value.")
-    parser.add_argument("--source-url", required=True, help="Expected source.url value.")
-    parser.add_argument("--source-license", required=True, help="Expected source.license value.")
-    return parser.parse_args()
+CATEGORY_KINDS = {
+    "coperception": "coperception-checkpoint",
+    "advcp": "advcp-assets",
+}
 
 
 def sha256(path: Path) -> str:
@@ -29,7 +24,7 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def validate_bundle(bundle_root: Path, expected_source: dict[str, str]) -> list[str]:
+def validate_bundle(bundle_root: Path, expected_kind: str) -> list[str]:
     errors: list[str] = []
     metadata_path = bundle_root / "meta.yaml"
     try:
@@ -39,10 +34,17 @@ def validate_bundle(bundle_root: Path, expected_source: dict[str, str]) -> list[
 
     if not isinstance(metadata, dict):
         return [f"{metadata_path}: metadata must be a mapping"]
+    if metadata.get("schema_version") != 1:
+        errors.append(f"{metadata_path}: unsupported schema version")
     if metadata.get("id") != bundle_root.name:
         errors.append(f"{metadata_path}: id does not match directory name")
-    if metadata.get("source") != expected_source:
-        errors.append(f"{metadata_path}: source does not match the expected repository, URL, and license")
+    if metadata.get("kind") != expected_kind:
+        errors.append(f"{metadata_path}: kind does not match bundle category")
+    source = metadata.get("source")
+    if not isinstance(source, dict) or not all(
+        isinstance(source.get(field), str) and source[field].strip() for field in ("repository", "url", "license")
+    ):
+        errors.append(f"{metadata_path}: source repository, URL, and license must be non-empty strings")
 
     artifacts = metadata.get("artifacts")
     if not isinstance(artifacts, list) or not artifacts:
@@ -67,18 +69,46 @@ def validate_bundle(bundle_root: Path, expected_source: dict[str, str]) -> list[
     return errors
 
 
-def main() -> int:
-    args = parse_args()
-    expected_source = {
-        "repository": args.source_repository,
-        "url": args.source_url,
-        "license": args.source_license,
-    }
+def validate_catalog(expected_entries: set[tuple[str, str, str]]) -> list[str]:
+    catalog_path = REPOSITORY_ROOT / "catalog.yaml"
+    try:
+        catalog = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as error:
+        return [f"{catalog_path}: {error}"]
+    if not isinstance(catalog, dict) or catalog.get("schema_version") != 1:
+        return [f"{catalog_path}: catalog must use schema version 1"]
+
+    bundles = catalog.get("bundles")
+    if not isinstance(bundles, list):
+        return [f"{catalog_path}: bundles must be a list"]
+
     errors: list[str] = []
-    for category in ("coperception", "advcp"):
+    actual_entries: list[tuple[str, str, str]] = []
+    for entry in bundles:
+        if not isinstance(entry, dict) or not all(isinstance(entry.get(field), str) for field in ("id", "kind", "path")):
+            errors.append(f"{catalog_path}: invalid bundle entry")
+            continue
+        actual_entries.append((entry["id"], entry["kind"], entry["path"]))
+
+    actual_entry_set = set(actual_entries)
+    if len(actual_entries) != len(actual_entry_set):
+        errors.append(f"{catalog_path}: duplicate bundle entries")
+    for entry in sorted(expected_entries - actual_entry_set):
+        errors.append(f"{catalog_path}: missing bundle entry {entry}")
+    for entry in sorted(actual_entry_set - expected_entries):
+        errors.append(f"{catalog_path}: unexpected bundle entry {entry}")
+    return errors
+
+
+def main() -> int:
+    errors: list[str] = []
+    expected_entries: set[tuple[str, str, str]] = set()
+    for category, kind in CATEGORY_KINDS.items():
         for bundle_root in sorted(REPOSITORY_ROOT.joinpath(category).iterdir()):
             if bundle_root.is_dir():
-                errors.extend(validate_bundle(bundle_root, expected_source))
+                errors.extend(validate_bundle(bundle_root, kind))
+                expected_entries.add((bundle_root.name, kind, bundle_root.relative_to(REPOSITORY_ROOT).as_posix()))
+    errors.extend(validate_catalog(expected_entries))
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1
