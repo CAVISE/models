@@ -1,0 +1,20 @@
+schema_version: 1
+id: pixor-early-opv2v-15
+kind: coperception-checkpoint
+version: 1
+compatibility:
+  framework: OpenCOOD
+  dataset: opv2v
+  fusion: early
+  requires_custom_cuda: false
+source:
+  repository: CAVISE/OpenCDA
+  url: REVIEW_REQUIRED
+  license: REVIEW_REQUIRED
+artifacts:
+  - path: config.yaml
+    size: 1311
+    sha256: 4eb598a90aef6106977c896ca738af51dcc16eef0cf3e83b7861bb7cf9395cc1
+  - path: net_epoch15.pth
+    size: 8717939
+    sha256: 3eb51cc1394b0d84047ecc0d1fb94c022b98062a834332dc2163011fcfa2d64e

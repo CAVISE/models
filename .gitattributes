@@ -1,0 +1,3 @@
+*.pkl -text
+*.ply -text
+*.pth -text

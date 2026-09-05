@@ -1,0 +1,20 @@
+schema_version: 1
+id: second-intermediate-opv2v-60
+kind: coperception-checkpoint
+version: 1
+compatibility:
+  framework: OpenCOOD
+  dataset: opv2v
+  fusion: intermediate
+  requires_custom_cuda: false
+source:
+  repository: CAVISE/OpenCDA
+  url: REVIEW_REQUIRED
+  license: REVIEW_REQUIRED
+artifacts:
+  - path: config.yaml
+    size: 2554
+    sha256: f800d6e640370e9f0c397d9af75b36abdada05c154b7e2e5e5a6b6a821e10356
+  - path: net_epoch60.pth
+    size: 21272407
+    sha256: 8fb17133ce4ebc5e6d6dff67705b1fb2886f3bf1f1aa3371c8bd7b5e01341b81

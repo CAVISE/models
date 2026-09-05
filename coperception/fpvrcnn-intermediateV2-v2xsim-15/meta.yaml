@@ -1,0 +1,20 @@
+schema_version: 1
+id: fpvrcnn-intermediateV2-v2xsim-15
+kind: coperception-checkpoint
+version: 1
+compatibility:
+  framework: OpenCOOD
+  dataset: v2xsim
+  fusion: intermediate
+  requires_custom_cuda: true
+source:
+  repository: CAVISE/OpenCDA
+  url: REVIEW_REQUIRED
+  license: REVIEW_REQUIRED
+artifacts:
+  - path: config.yaml
+    size: 4543
+    sha256: 9ccbbcf97aa9ef88bc4bc047db4bfaabf6272ec34a067c6ce94335548038c2f3
+  - path: net_epoch15.pth
+    size: 44947408
+    sha256: 830e5228c7876130dfa3e385ca3bbced926a8253fb79d06b6fd94df36b2aa672

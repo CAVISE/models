@@ -1,0 +1,20 @@
+schema_version: 1
+id: pointpillar-v2xvit-intermediate-opv2v-22
+kind: coperception-checkpoint
+version: 1
+compatibility:
+  framework: OpenCOOD
+  dataset: opv2v
+  fusion: intermediate
+  requires_custom_cuda: false
+source:
+  repository: CAVISE/OpenCDA
+  url: REVIEW_REQUIRED
+  license: REVIEW_REQUIRED
+artifacts:
+  - path: config.yaml
+    size: 3897
+    sha256: be57bd209234ec8b81a6f3b022451e0b0384e2490167078fb489bd65b69fd853
+  - path: net_epoch22.pth
+    size: 54316856
+    sha256: ab6185ee424b515fd01f577ce59cc0f966888aa857534245b1a5dfdf9587b3b6

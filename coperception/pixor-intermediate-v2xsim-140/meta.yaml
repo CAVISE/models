@@ -1,0 +1,20 @@
+schema_version: 1
+id: pixor-intermediate-v2xsim-140
+kind: coperception-checkpoint
+version: 1
+compatibility:
+  framework: OpenCOOD
+  dataset: v2xsim
+  fusion: intermediate
+  requires_custom_cuda: false
+source:
+  repository: CAVISE/OpenCDA
+  url: REVIEW_REQUIRED
+  license: REVIEW_REQUIRED
+artifacts:
+  - path: config.yaml
+    size: 1406
+    sha256: f0d56770ab12a522b17e46bd0a05daa60af7d4c7b08fe9dcf2f8d8178a289b28
+  - path: net_epoch140.pth
+    size: 8732423
+    sha256: 880dc3f1fcd68e526e7b22e43480149811d0ec85bd2d2d73f19b6a1a2bb8ce78

@@ -1,0 +1,53 @@
+schema_version: 1
+bundles:
+  - id: base-car
+    kind: advcp-assets
+    path: advcp/base-car
+  - id: fpvrcnn-intermediateV2-opv2v-40
+    kind: coperception-checkpoint
+    path: coperception/fpvrcnn-intermediateV2-opv2v-40
+  - id: fpvrcnn-intermediateV2-v2xsim-15
+    kind: coperception-checkpoint
+    path: coperception/fpvrcnn-intermediateV2-v2xsim-15
+  - id: pixor-early-opv2v-15
+    kind: coperception-checkpoint
+    path: coperception/pixor-early-opv2v-15
+  - id: pixor-intermediate-v2xsim-140
+    kind: coperception-checkpoint
+    path: coperception/pixor-intermediate-v2xsim-140
+  - id: pointpillar-cobevt-intermediate-opv2v-90
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-cobevt-intermediate-opv2v-90
+  - id: pointpillar-early-opv2v-X
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-early-opv2v-X
+  - id: pointpillar-intermediate-opv2v-20
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-intermediate-opv2v-20
+  - id: pointpillar-late-opv2v-30
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-late-opv2v-30
+  - id: pointpillar-v2vnet-intermediate-opv2v-55
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-v2vnet-intermediate-opv2v-55
+  - id: pointpillar-v2vnet-intermediate-v2xsim-49
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-v2vnet-intermediate-v2xsim-49
+  - id: pointpillar-v2xvit-intermediate-opv2v-22
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-v2xvit-intermediate-opv2v-22
+  - id: pointpillar-v2xvit-intermediate-v2xsim-21
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-v2xvit-intermediate-v2xsim-21
+  - id: pointpillar-where2comm-intermediate-opv2v-54
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-where2comm-intermediate-opv2v-54
+  - id: pointpillar-where2comm-intermediate-v2xsim-50
+    kind: coperception-checkpoint
+    path: coperception/pointpillar-where2comm-intermediate-v2xsim-50
+  - id: second-intermediate-opv2v-60
+    kind: coperception-checkpoint
+    path: coperception/second-intermediate-opv2v-60
+  - id: voxelnet-intermediate-opv2v-15
+    kind: coperception-checkpoint
+    path: coperception/voxelnet-intermediate-opv2v-15

@@ -1,0 +1,15 @@
+schema_version: 1
+id: base-car
+kind: advcp-assets
+version: 1
+source:
+  repository: CAVISE/OpenCDA
+  url: REVIEW_REQUIRED
+  license: REVIEW_REQUIRED
+artifacts:
+  - path: car_mesh_0200.ply
+    size: 4611459
+    sha256: ea86665771888988fce64aaaedbb14f93497440ce396c3d49204a5b507c3ab71
+  - path: spoof/car_mesh_divide.pkl
+    size: 1793281
+    sha256: eed0a2c66f25209839df3f04f88a7a42b1fcaa10c11bddd8fd0382eb71d01ede

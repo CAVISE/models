@@ -1,0 +1,20 @@
+schema_version: 1
+id: voxelnet-intermediate-opv2v-15
+kind: coperception-checkpoint
+version: 1
+compatibility:
+  framework: OpenCOOD
+  dataset: opv2v
+  fusion: intermediate
+  requires_custom_cuda: false
+source:
+  repository: CAVISE/OpenCDA
+  url: REVIEW_REQUIRED
+  license: REVIEW_REQUIRED
+artifacts:
+  - path: config.yaml
+    size: 1737
+    sha256: 94afb7a89f96d2826fab3c08475a1454dcbc9af9fecff1d243952b01c1ecaf11
+  - path: net_epoch15.pth
+    size: 27350683
+    sha256: 0f2b56fa0a826ccae7f5755d4417f13a2df1cea6eb364cc59325f183664fcff3
