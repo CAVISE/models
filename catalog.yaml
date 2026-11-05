@@ -3,6 +3,21 @@ bundles:
   - id: base-car
     kind: advcp-assets
     path: advcp/base-car
+  - id: generic-box-audi-a2
+    kind: advcp-assets
+    path: advcp/generic-box-audi-a2
+  - id: generic-box-dodge-charger-2020
+    kind: advcp-assets
+    path: advcp/generic-box-dodge-charger-2020
+  - id: generic-box-lincoln-mkz-2017
+    kind: advcp-assets
+    path: advcp/generic-box-lincoln-mkz-2017
+  - id: generic-box-mercedes-coupe-2020
+    kind: advcp-assets
+    path: advcp/generic-box-mercedes-coupe-2020
+  - id: generic-box-tesla-model3
+    kind: advcp-assets
+    path: advcp/generic-box-tesla-model3
   - id: fpvrcnn-intermediateV2-opv2v-40
     kind: coperception-checkpoint
     path: coperception/fpvrcnn-intermediateV2-opv2v-40

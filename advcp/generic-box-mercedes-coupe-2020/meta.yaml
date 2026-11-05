@@ -1,0 +1,12 @@
+schema_version: 1
+id: generic-box-mercedes-coupe-2020
+kind: advcp-assets
+version: 1
+source:
+  repository: "CAVISE/OpenCDA"
+  url: "https://github.com/CAVISE/OpenCDA"
+  license: "MIT"
+artifacts:
+  - path: "car_mesh.ply"
+    size: 5537
+    sha256: 752273d0613b3ea5fe619270962d24a0c833fa6b5c74cae382b6d68137713c05
