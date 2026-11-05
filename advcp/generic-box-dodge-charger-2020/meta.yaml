@@ -1,0 +1,12 @@
+schema_version: 1
+id: generic-box-dodge-charger-2020
+kind: advcp-assets
+version: 1
+source:
+  repository: "CAVISE/OpenCDA"
+  url: "https://github.com/CAVISE/OpenCDA"
+  license: "MIT"
+artifacts:
+  - path: "car_mesh.ply"
+    size: 5537
+    sha256: f81814bb67f0c318175436cea3ec354b97badd8435fb48b196f09b759c550ba0

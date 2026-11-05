@@ -1,0 +1,12 @@
+schema_version: 1
+id: generic-box-lincoln-mkz-2017
+kind: advcp-assets
+version: 1
+source:
+  repository: "CAVISE/OpenCDA"
+  url: "https://github.com/CAVISE/OpenCDA"
+  license: "MIT"
+artifacts:
+  - path: "car_mesh.ply"
+    size: 5537
+    sha256: 197d7af89f937ee845031f0f711c4b4a5266ea25986af096436f8a7e0a76a0a1

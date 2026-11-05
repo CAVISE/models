@@ -1,0 +1,12 @@
+schema_version: 1
+id: generic-box-tesla-model3
+kind: advcp-assets
+version: 1
+source:
+  repository: "CAVISE/OpenCDA"
+  url: "https://github.com/CAVISE/OpenCDA"
+  license: "MIT"
+artifacts:
+  - path: "car_mesh.ply"
+    size: 5537
+    sha256: 1a7d496700f5dc989999f51fe51f2b059986396f3d79efda0fce268844460c79
